@@ -28,7 +28,6 @@ def help_screen():
 	print "  Usage example:"
 	print "  ./sickfuzz.py --spike /pentest/fuzzers/spike/ --fpath /root/sickfuzz/ --script all --ip 192.168.1.64 --port 80 --iface wlan0 --log /root/"+"\n"
 	print "  IMPORTANT: DO NOT USE THE pcap_logs DIRECTORY TO SAVE LOGS from --log !!!\n"
-<<<<<<< .mine
 	print "	-h/--help  - prints this help menu."
 	print "	-s/--spike <path to spike folder>"
 	print "	-f/--fpath <path to the fuzzer>"
@@ -69,85 +68,6 @@ def path_fix():
 	fuzz_path = fuzz_path.rstrip("/")+"/"
 
 	
-=======
-	print "	-h/--help  - prints this help menu."
-	print "	-s/--spike <path to spike folder>"
-	print "	-f/--fpath <path to the fuzzer>"
-	print "	-c/--script <[all]/[number]>    use --script-show to view available scripts"
-	print "	-t/--ip <target ip>"
-	print "	-p/--port <target port>"
-	print "	-i/--iface <network interface>"
-	print "	-l/--log <path where .pcap log files will be saved>\n"
-	sys.exit()
-
-def script_show():
-	print "  [1/12] Fuzzing: GET /"
-	print "  [2/12] Fuzzing: GET /abc="
-	print "  [3/12] Fuzzing: HEAD /"
-	print "  [4/12] Fuzzing: POST /"
-	print "  [5/12] Fuzzing: GET / HTTP/1.1"
-	print "  [6/11] Fuzzing: HEAD / HTTP/1.1"
-	print "  [7/12] Fuzzing: POST / HTTP/1.1"
-	print "  [8/12] Fuzzing: Authorization:"
-	print "  [9/12] Fuzzing: Content-Length:"
-	print "  [10/12] Fuzzing: If-Modified-Since:"
-	print "  [11/12] Fuzzing: Connection:"
-	print "  [12/12] Fuzzing: X-a:"
-	sys.exit()
-
-if len(sys.argv) == 1:
-	help_screen()
-elif sys.argv[1] == ("--script-show" or "-c-show"):
-	script_show()
-elif sys.argv[1] == ("-?" or "-h" or "--help"):
-	help_screen()
-
-
-def path_fix():
-	spike_path = sys.argv[3]
-	fuzz_path = sys.argv[5]
-	spike_path = spike_path.rstrip("/")+"/"
-	fuzz_path = fuzz_path.rstrip("/")+"/"
-
-def openport():
-	try:
-                con = urllib2.urlopen("http://"+ip+":"+port)
-                data = con.read()
-		print " [>] Application did not crash!"
-		print " [>] Resumming fuzzing ..."
-		return True
-	except:
-		print "\n [>] We have a crash!!\n"
-		clean_up()
-		return False
-		sys.exit()
-
-def spike_fuzz( x ):
-	if x == 0: print " [>] [1/12] Fuzzing: GET /"
-	elif x == 1: print " [>] [2/12] Fuzzing: GET /abc="
-	elif x == 2: print " [>] [3/12] Fuzzing: HEAD /"
-	elif x == 3: print " [>] [4/12] Fuzzing: POST /"
-	elif x == 4: print " [>] [5/12] Fuzzing: GET / HTTP/1.1"
-	elif x == 5: print " [>] [6/12] Fuzzing: HEAD / HTTP/1.1"
-	elif x == 6: print " [>] [7/12] Fuzzing: POST / HTTP/1.1"
-	elif x == 7: print " [>] [8/12] Fuzzing: Authorization:"
-	elif x == 8: print " [>] [9/12] Fuzzing: Content-Length:"
-	elif x == 9: print " [>] [10/12] Fuzzing: If-Modified-Since:"
-	elif x == 10: print " [>] [11/12] Fuzzing: Connection:"
-	elif x == 11: print " [>] [12/12] Fuzzing: X-a:"
-	try:
-		subprocess.Popen("export LD_LIBRARY_PATH=. && cd "+spike+"&&"+fuzzer+" "+ip+" "+port+" "+fpath+scripts[x]+" "+skipv+" > "+fpath+"spike_log.txt",shell=True).wait()
-	except KeyboardInterrupt:
-		openport()
-	if openport() == True:
-		print " [>] Finished, moving to next script ...\n"
-	else:
-		print "\n [>] We have a crash!!\n"
-		clean_up()
-		sys.exit()
-	sleep(5)
-
->>>>>>> .r7
 def openport():
 	s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 	try:
@@ -242,13 +162,8 @@ try:
 		sys.exit()
 	
 	path_fix()
-<<<<<<< .mine
 
 	print " [>] Starting: sickfuzz v0.2"
-=======
-	
-	print " [>] Starting: sickfuzz v0.2"
->>>>>>> .r7
 	if openport() == True:
 		pass
 	else:
