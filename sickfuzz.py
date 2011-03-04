@@ -133,7 +133,13 @@ for o, a in opts:
 		iface = a
 	if o in ("-l", "--log"):
 		log = a
+<<<<<<< .mine
+	if o in ("-h", "--help"):
+		help_screen()
 		
+=======
+		
+>>>>>>> .r9
 try:
 	fuzzer = "./generic_send_tcp"
 	scripts = ["HTTP/web00.spk","HTTP/web01.spk","HTTP/web02.spk","HTTP/web03.spk","HTTP/web04.spk","HTTP/web05.spk","HTTP/web06.spk","HTTP/web07.spk","HTTP/web08.spk","HTTP/web09.spk","HTTP/web10.spk","HTTP/web11.spk"]
