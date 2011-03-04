@@ -133,7 +133,6 @@ for o, a in opts:
 		iface = a
 	if o in ("-l", "--log"):
 		log = a
-<<<<<<< .mine
 	if o in ("-h", "--help"):
 		help_screen()
 		
