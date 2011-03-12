@@ -21,7 +21,7 @@ def help_screen():
 	print "  /\__, `\ \ \/\ \__/\ \ \\`\    \ \ \_/\ \ \_\ \/_/  /_\/_/  /_ "
 	print "  \/\____/\ \_\ \____\\ \_\ \_\   \ \_\  \ \____/ /\____\ /\____\ "
 	print "   \/___/  \/_/\/____/ \/_/\/_/    \/_/   \/___/  \/____/ \/____/\n\n"
-	print "  Welcome to sickfuzz version 0.2"
+	print "  Welcome to sickfuzz version 0.3"
 	print "  Codename: 'Have you g0tmi1k!?'"
 	print "  Author: sickness"
 	print "  Bug reports or suggestions at: sick.n3ss416@gmail.com\n"
