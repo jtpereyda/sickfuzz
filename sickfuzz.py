@@ -14,13 +14,13 @@ iface = ""
 log = ""
 #-------------------------------------------------------------------------------
 def help_screen():
-	print "                  __             ___                           "
-	print "       __        /\ \          /'___\                          "
-	print "  ____/\_\    ___\ \ \/'\     /\ \__/  __  __  ____    ____    "
-	print " /',__\/\ \  /'___\ \ , <     \ \ ,__\/\ \/\ \/\_ ,`\ /\_ ,`\  "
-	print "/\__, `\ \ \/\ \__/\ \ \\`\    \ \ \_/\ \ \_\ \/_/  /_\/_/  /_ "
-	print "\/\____/\ \_\ \____\\ \_\ \_\   \ \_\  \ \____/ /\____\ /\____\ "
-	print " \/___/  \/_/\/____/ \/_/\/_/    \/_/   \/___/  \/____/ \/____/\n\n"
+	print "                    __             ___                           "
+	print "         __        /\ \          /'___\                          "
+	print "     ____/\_\    ___\ \ \/'\     /\ \__/  __  __  ____    ____    "
+	print "   /',__\/\ \  /'___\ \ , <     \ \ ,__\/\ \/\ \/\_ ,`\ /\_ ,`\  "
+	print "  /\__, `\ \ \/\ \__/\ \ \\`\    \ \ \_/\ \ \_\ \/_/  /_\/_/  /_ "
+	print "  \/\____/\ \_\ \____\\ \_\ \_\   \ \_\  \ \____/ /\____\ /\____\ "
+	print "   \/___/  \/_/\/____/ \/_/\/_/    \/_/   \/___/  \/____/ \/____/\n\n"
 	print "  Welcome to sickfuzz version 0.2"
 	print "  Codename: 'Have you g0tmi1k!?'"
 	print "  Author: sickness"
@@ -35,12 +35,12 @@ def help_screen():
 	print "	-t/--ip <target ip>"
 	print "	-p/--port <target port>"
 	print "	-i/--iface <network interface>"
-	print "	-l/--log <path where .pcap log files will be saved>\n"
+	print "	-l/--log <path where .pcap log files will be saved> (Other then 'pcap_logs' directory.)\n"
 	sys.exit()
 
 def script_show():
-	print "  [1/12] Fuzzing: GET /"
-	print "  [2/12] Fuzzing: GET /abc="
+	print "  [1/12] Fuzzing: AAAA"
+	print "  [2/12] Fuzzing: GET /"
 	print "  [3/12] Fuzzing: HEAD /"
 	print "  [4/12] Fuzzing: POST /"
 	print "  [5/12] Fuzzing: GET / HTTP/1.1"
@@ -60,13 +60,6 @@ elif sys.argv[1] == ("--script-show" or "-c-show"):
 elif sys.argv[1] == ("-?" or "-h" or "--help"):
 	help_screen()
 
-
-def path_fix():
-	spike_path = sys.argv[3]
-	fuzz_path = sys.argv[5]
-	spike_path = spike_path.rstrip("/")+"/"
-	fuzz_path = fuzz_path.rstrip("/")+"/"
-
 	
 def openport():
 	s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -79,8 +72,8 @@ def openport():
 	
 
 def spike_fuzz( x ):
-	if x == 0: print " [>] [1/12] Fuzzing: GET /"
-	elif x == 1: print " [>] [2/12] Fuzzing: GET /abc="
+	if x == 0: print " [>] [1/12] Fuzzing: AAAA"
+	elif x == 1: print " [>] [2/12] Fuzzing: GET /"
 	elif x == 2: print " [>] [3/12] Fuzzing: HEAD /"
 	elif x == 3: print " [>] [4/12] Fuzzing: POST /"
 	elif x == 4: print " [>] [5/12] Fuzzing: GET / HTTP/1.1"
@@ -94,24 +87,38 @@ def spike_fuzz( x ):
 	try:
 		subprocess.Popen("export LD_LIBRARY_PATH=. && cd "+spike+"&&"+fuzzer+" "+ip+" "+port+" "+fpath+scripts[x]+" "+skipv+" > "+fpath+"spike_log.txt",shell=True).wait()
 	except KeyboardInterrupt:
-		openport()
+		print " [>] Press CTRL+C again to stop fuzzing and start the clear-up process!\n"
+		sleep(1000000)
 	if openport() == True:
-		print " [>] Finished, moving to next script ...\n"
-	else:
-		print "\n [>] We have a crash!!\n"
+		try:
+			print "\n [>] Finished, moving to next script ..."
+			print " [>] Press CTRL+C again to stop fuzzing!\n"
+		except KeyboardInterrupt:
+			log = log.rstrip("/")+"/"
+			clean_up()
+			sys.exit()
+	elif openport() == False:
+		print " [>] We have a crash!"
+		log = log.rstrip("/")+"/"
 		clean_up()
 		sys.exit()
-	sleep(5)
-
+		
 def clean_up():
 	print " [>] Stopping fuzzing and tshark ..."
 	os.kill(tshark.pid,signal.SIGTERM)
+	print " [>] Starting clean-up process"
 	print " [>] Splitting .pcap files"
 	subprocess.Popen("editcap -c 10000 "+fpath+"pcap_logs/fuzzing_log.pcap"+" "+fpath+"pcap_logs/logs.pcap",shell=True).wait()
 	subprocess.Popen("mv -f "+fpath+"pcap_logs/*"+" "+log,shell=True).wait()
 	subprocess.Popen("rm -rf "+fpath+"pcap_logs/*",shell=True).wait()
-	subprocess.Popen("rm -rf "+fpath+"spike_log.txt",shell=True).wait()
-	print " [>] Done!\n"
+	subprocess.Popen("mv -f "+fpath+"spike_log.txt"+" "+log,shell=True).wait()
+	print " [>] Done!"
+	print " [>] Go to the 'pcap_logs' directory and delete anything from there.(DONT DO rm -rf pcap_logs/*)"
+	print " [>] For more details about the fuzzing strings open 'spike_log.txt' from your log directory.\n"
+	
+time_start = time.time()
+print "\n [>] Fuzzing starting at "+strftime("%a, %d %b %Y %H:%M:%S", localtime())+" ..."
+sleep(2)
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], "s:f:c:t:p:i:l:h?", ["spike=","fpath=","script=","ip=","port=","iface=", "log=","help"])
@@ -133,10 +140,9 @@ for o, a in opts:
 		iface = a
 	if o in ("-l", "--log"):
 		log = a
-	if o in ("-h", "--help"):
-		help_screen()
+		
 try:
-	fuzzer = "./generic_send_tcp"
+	fuzzer = "./generic_web_server_fuzz2"
 	scripts = ["HTTP/web00.spk","HTTP/web01.spk","HTTP/web02.spk","HTTP/web03.spk","HTTP/web04.spk","HTTP/web05.spk","HTTP/web06.spk","HTTP/web07.spk","HTTP/web08.spk","HTTP/web09.spk","HTTP/web10.spk","HTTP/web11.spk"]
 	skipv = "0 0"
 	
@@ -161,74 +167,96 @@ try:
 	if log == "" :
 		print "Missing \"--log/-l\", check --help for more info.\n"
 		sys.exit()
-	
-	path_fix()
 
-	print " [>] Starting: sickfuzz v0.2"
+	print " [>] Starting: sickfuzz v0.3"
 	if openport() == True:
 		pass
 	else:
 		print " [>] Could not connect, check if the port is opened!"
 		sys.exit()
 	print " [>] Launching packet capture, please wait ..."
-	sleep(2)
 	try:
+		fpath = fpath.rstrip("/")+"/"
 		tshark = subprocess.Popen("tshark -i "+iface+" -d tcp.port=="+port+",http -w "+fpath+"pcap_logs/fuzzing_log.pcap -q",shell=True)
-		print " [>] Capturing packets, now starting the fuzzer ...!\r"
 		sleep(2)
+		print " [>] Capturing packets, now starting the fuzzer ...!\n"
+		sleep(1)
 	except KeyboardInterrupt:
 		print " [>] Something went wrong!"
 		print " [>] Exiting ..."
 		sys.exit()
-
-	start = time.time()
-	print " [>] Fuzzing starting at "+strftime("%a, %d %b %Y %H:%M:%S", localtime())+" ...\n"
-	sleep(2)
 	
 	if script == "all":
 		script_numbers = range(0,12) # Scripts from 1 to 12.
 		for i in script_numbers:
 			if openport() == True:
+				spike = spike.rstrip("/")+"/"
+				fpath = fpath.rstrip("/")+"/"
 				spike_fuzz( i )
 
 			else:
+				log = log.rstrip("/")+"/"
 				clean_up()
 				sys.exit()
 	else:
 		if script == "1":
+			spike = spike.rstrip("/")+"/"
+			fpath = fpath.rstrip("/")+"/"
 			spike_fuzz( 0 )
 		elif script == "2":
+			spike = spike.rstrip("/")+"/"
+			fpath = fpath.rstrip("/")+"/"
 			spike_fuzz( 1 )
 		elif script == "3":
+			spike = spike.rstrip("/")+"/"
+			fpath = fpath.rstrip("/")+"/"
 			spike_fuzz( 2 )
 		elif script == "4":
+			spike = spike.rstrip("/")+"/"
+			fpath = fpath.rstrip("/")+"/"
 			spike_fuzz( 3 )
 		elif script == "5":
+			spike = spike.rstrip("/")+"/"
+			fpath = fpath.rstrip("/")+"/"
 			spike_fuzz( 4 )
 		elif script == "6":
+			spike = spike.rstrip("/")+"/"
+			fpath = fpath.rstrip("/")+"/"
 			spike_fuzz( 5 )
 		elif script == "7":
+			spike = spike.rstrip("/")+"/"
+			fpath = fpath.rstrip("/")+"/"
 			spike_fuzz( 6 )
 		elif script == "8":
+			spike = spike.rstrip("/")+"/"
+			fpath = fpath.rstrip("/")+"/"
 			spike_fuzz( 7 )
 		elif script == "9":
+			spike = spike.rstrip("/")+"/"
+			fpath = fpath.rstrip("/")+"/"
 			spike_fuzz( 8 )
 		elif script == "10":
+			spike = spike.rstrip("/")+"/"
+			fpath = fpath.rstrip("/")+"/"
 			spike_fuzz( 9 )
 		elif script == "11":
+			spike = spike.rstrip("/")+"/"
+			fpath = fpath.rstrip("/")+"/"
 			spike_fuzz( 10 )
 		elif script == "12":
+			spike = spike.rstrip("/")+"/"
+			fpath = fpath.rstrip("/")+"/"
 			spike_fuzz( 11 )
 		else:
 			print " [-] You have picked an invalid script."
 			print " [-] Use the -c-show/--script-show flags to see available scripts."
 		print "\n"
-
-	print " [>] Fuzzing process ended at: "+strftime("%a, %d %b %Y %H:%M:%S", localtime())
-	print " [>] Elapsed time: %.2f minutes" % ((time.time() - time_start)/60)
-	clean_up()
 #-------------------------------------------------------------------------------
 except KeyboardInterrupt:
-	print "\n"
+	print "\r"
+	print " [>] Fuzzing process ended at: "+strftime("%a, %d %b %Y %H:%M:%S", localtime())
+	print " [>] Elapsed time: %.2f minutes" % ((time.time() - time_start)/60)
+	print "\r"
+	log = log.rstrip("/")+"/"
 	clean_up()
 	sys.exit()
