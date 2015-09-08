@@ -1,4 +1,4 @@
-s_string("GET /");
-s_string_variable("index.html");
+s_string("POST /");
+s_string_variable("AAAAAA");
 s_string("\r\n\r\n");
-usleep(200000);
+usleep(20000); 
