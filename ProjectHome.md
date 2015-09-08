@@ -1,0 +1,1 @@
+sickfuzz is a fuzzer made out of several custom .spk files and a python script to wrap them up, including some tshark support and other features.
